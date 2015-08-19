@@ -1,0 +1,26 @@
+<div class="row">
+	<div class="col-md-12">
+		<h2>Login</h2>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<p ng-show="user">Benvenuto, <strong>{{user.username}}</strong>.</p>
+	</div>
+</div>
+<div class="row" ng-show="!user">
+	<div class="col-md-4">
+		<p>Inserire le credenziali richieste.</p>
+		<form name="login_form" ng-submit="tryLogin()" novalidate>
+			<div class="form-group {{error.not_found ? 'has-error' : ''}}">
+				<input name="username" class="form-control" placeholder="Nome Utente" ng-model="username" required autofocus>
+				<div class="alert alert-danger" ng-show="error.not_found"><span class="glyphicon glyphicon-exclamation-sign"></span>Utente non trovato</div>
+			</div>
+			<div class="form-group {{error.wrong_password ? 'has-error' : ''}}">
+				<input name="password" type="password" class="form-control" placeholder="Password" ng-model="password" required>
+				<div class="alert alert-danger" ng-show="error.wrong_password"><span class="glyphicon glyphicon-exclamation-sign"></span>Password errata</div>
+			</div>
+			<button type="submit" class="btn btn-primary" ng-disabled="login_form.$invalid || trying_login"><span class="glyphicon glyphicon-log-in"></span> Login</button>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,69 @@
+<div class="row">
+	<div class="col-md-12">
+		<h2>Compila RIL</h2>
+		<p>Inserire le informazioni richieste. Si può effettuare (e memorizzare) una compilazione parziale, ma entro la fine del mese è necessario aver compilato il modulo nella sua interezza.</p>
+		<p>Le <span class="text-danger">righe evidenziate in rosso</span> sono ritenute errate. Controllare il rispetto dei formati e la coerenza delle informazioni inserite. Non sarà possibile salvare il modulo fin quando non verranno apportate le dovute correzioni.</p>
+		<p>Le <span class="text-success">righe evidenziate in verde</span> sono ritenute complete e corrette. Entro la fine del mese tutte le righe dovranno risultare verdi.</p>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<h3>Strumenti <span class="small glyphicon glyphicon-wrench"></span></h3>
+		<div class="well toolbar">
+			<button ng-click="fillWithStandardWorkHours()" class="btn btn-success" tooltip="Riempi tutte le righe con ingresso alle 09:00 e uscita alle 18:00."><span class="glyphicon glyphicon-flash"></span> 09:00 - 18:00</button>
+			<button ng-click="cloneFirstRow()" class="btn btn-success" tooltip="Riempi tutte le righe con il contenuto della prima."><span class="glyphicon glyphicon-flash"></span> Clona Riga 1</button>
+			<button ng-click="save()" ng-disabled="anyCompleteButInvalid() || saving" class="btn btn-primary" tooltip="Salva le informazioni attualmente inserite."><span class="glyphicon glyphicon-floppy-save"></span> Salva</button>
+			<button ng-click="reset()" class="btn btn-warning" tooltip="Elimina tutte le informazioni attualmente inserite."><span class="glyphicon glyphicon-trash"></span> Reimposta</button>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="alert alert-info" ng-hide="ril">
+			<span class="glyphicon glyphicon-hourglass"></span> Caricamento RIL in corso
+		</div>
+		<div class="panel panel-default" ng-show="ril">
+		  <div class="panel-heading"><span class="glyphicon glyphicon-calendar"></span> RIL {{months[month - 1]}} {{year}}</div>
+		  <div class="table-responsive">
+			  <table class="table">
+			    <thead>
+			    	<tr>
+			    		<th>Giorno</th>
+			    		<th>Oario Ingresso</th>
+			    		<th>Orario Uscita</th>
+			    		<th>Codice Commessa</th>
+			    		<th>Assenza?</th>
+			    		<th>Trasferta?</th>
+			    		<th>Note Trasferta</th>
+			    	</tr>
+			    </thead>
+			    <tbody>
+			    	<tr ng-repeat="row in ril.rows" ng-controller="CompilaRigaRilController" ng-class="{ success: !row.status.incomplete, danger: !row.status.incomplete && !row.status.valid }">
+			    		<td>{{days_of_week[row.day.day_of_week - 1]}} {{row.day.day_of_month}}</td>
+			    		<td><input ng-model="row.data.entrance" ng-disabled="saving" class="form-control" placeholder="HH:MM"></td>
+			    		<td><input ng-model="row.data.exit" ng-disabled="saving" class="form-control" placeholder="HH:MM"></td>
+			    		<td><input ng-model="row.data.commission_code" ng-disabled="saving" class="form-control"></td>
+			    		<td>
+			    			<select ng-model="row.data.absence" ng-disabled="saving" class="form-control">
+								  <option value="no">No</option>
+								  <option value="festività">Festività</option>
+								  <option value="malattia">Malattia</option>
+								  <option value="permesso">Permesso</option>
+								  <option value="ferie">Ferie</option>
+								</select>
+							</td>
+			    		<td>
+			    			<select ng-model="row.data.business_trip" ng-disabled="saving" class="form-control">
+								  <option value="no">No</option>
+								  <option value="trasferta">Trasferta</option>
+								  <option value="sede_disagiata">Sede Disagiata</option>
+								</select>
+							</td>
+							<td><input ng-model="row.data.business_trip_notes" ng-disabled="saving" class="form-control" tooltip="Non compilare qualora non sia stata effettuata alcuna trasferta."></td>
+			    	</tr>
+			    </tbody>
+			  </table>
+			</div>
+		</div>
+	</div>
+</div>

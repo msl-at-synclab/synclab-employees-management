@@ -1,0 +1,78 @@
+/* Required by Angular UI Bootstrap */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.row.vertical-margin {
+	margin-top: 20px;
+}
+
+.row.empty-footer {
+	margin-top: 100px;
+}
+
+.glyphicon-log-in {
+	margin-right: 2px;
+}
+
+.glyphicon-exclamation-sign {
+	margin-right: 4px;
+}
+
+.form-group > .alert {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding: 7px;
+}
+
+.well.toolbar {
+	padding: 10px;
+}
+
+@keyframes fall_down {
+	from { margin-top: -100px; margin-right: 0; }
+	to { margin-top: 0; margin-right: 10px; }
+}
+
+@keyframes enter_from_left {
+	from { margin-left: -100px; }
+	to { margin-left: 0; }
+}
+
+@keyframes fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+body {
+	font-family: 'Open Sans Condensed', sans-serif;
+}
+
+p {
+	font-size: 20px;
+	text-align: justify;
+}
+
+h1 {
+	animation-name: fade-in;
+	animation-duration: 1s;
+}
+
+h1 > img {
+	margin-right: 10px;
+	animation-name: fall_down;
+	animation-duration: 1s;
+}
+
+nav {
+	animation-name: enter_from_left;
+	animation-duration: 0.5s;
+	font-size: 15px;
+}
+
+[ng-view] {
+	animation-name: fade-in;
+	animation-duration: 1s;
+}
+
+span.form-control-feedback {
+	font-size: 10px;
+}

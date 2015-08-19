@@ -1,0 +1,12 @@
+{
+  "name": "synclab-employees-management",
+  "version": "0.0.0",
+  "description": "Web Application for Sync Lab employees management",
+  "devDependencies": {
+    "angular": "^1.4.4",
+    "angular-route": "^1.4.4",
+    "angular-ui-bootstrap": "^0.13.3",
+    "bootstrap": "^3.3.5",
+    "http-server": "^0.8.0"
+  }
+}

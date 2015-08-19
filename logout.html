@@ -1,0 +1,16 @@
+<div class="row">
+	<div class="col-md-12">
+		<h2>Logout</h2>
+	</div>
+</div>
+<div class="row" ng-hide="logged_out">
+	<div class="col-md-12">
+		<p>Per concludere la sessione corrente, cliccare sul pulsante di logout.</p>
+		<button class="btn btn-primary" ng-click="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</button>
+	</div>
+</div>
+<div class="row" ng-show="logged_out">
+	<div class="col-md-12">
+		<p>Logout effettuato con successo.</p>
+	</div>
+</div>

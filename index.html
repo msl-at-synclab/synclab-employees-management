@@ -1,0 +1,46 @@
+<!doctype hmtl>
+<html lang="it" ng-app="syncLabEmployeesManagementApp">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="icons/favicon.png">
+	<title>Sync Lab Gestione del Personale</title>
+	<!-- Bootstrap -->
+	<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- A cool font -->
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
+	<!-- My CSS -->
+	<link href="style.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="row vertical-margin"></div>
+		<div class="row">
+			<div class="col-md-12">
+				<h1><img src="icons/logo-32.png"> Gestione del Personale</h1>
+			</div>
+		</div>
+		<div class="row vertical-margin"></div>
+		<div class="row">
+			<div class="col-md-12">
+				<nav ng-controller="MenuController">
+					<ul class="nav nav-tabs">
+						<li ng-repeat="item in items" ng-class="item.selected ? 'active' : ''" ng-hide="(item.requires_login && !user) || (item.hide_after_login && user)  || (item.requires_role && item.requires_role !== user.role)"><a href="#{{item.path}}">{{item.text}}</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+		<div class="row vertical-margin"></div>
+		<div ng-view></div>
+		<div class="row empty-footer"></div>
+	</div>
+	<!-- Angular -->
+	<script src="node_modules/angular/angular.min.js"></script>
+	<script src="node_modules/angular-route/angular-route.min.js"></script>
+	<!-- Bootstrap UI -->
+	<script src="node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.min.js"></script>
+	<!-- My JavaScript -->
+	<script src="script.js"></script>
+</body>
+</html>
