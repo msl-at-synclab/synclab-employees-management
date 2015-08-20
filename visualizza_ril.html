@@ -1,0 +1,105 @@
+<div class="row">
+	<div class="col-md-12">
+		<h2>Visualizza RIL</h2>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<form ng-submit="loadRils()" class="form-inline">
+			<p>Seleziona il periodo di interesse:</p>
+		  <div class="form-group">
+		    <label>Mese</label>
+		    <select ng-model="month" ng-disabled="loading_rils" class="form-control">
+		    	<option value="1">Gennaio</option>
+		    	<option value="2">Febbraio</option>
+		    	<option value="3">Marzo</option>
+		    	<option value="4">Aprile</option>
+		    	<option value="5">Maggio</option>
+		    	<option value="6">Giugno</option>
+		    	<option value="7">Luglio</option>
+		    	<option value="8">Agosto</option>
+		    	<option value="9">Settembre</option>
+		    	<option value="10">Ottobre</option>
+		    	<option value="11">Novembre</option>
+		    	<option value="12">Dicembre</option>
+		    </select>
+		  </div>
+		  <div class="form-group">
+		    <label>Anno</label>
+		    <select ng-model="year" ng-disabled="loading_rils" class="form-control">
+		    	<option value="2015">2015</option>
+		    	<option value="2016">2016</option>
+		    	<option value="2017">2017</option>
+		    	<option value="2018">2018</option>
+		    	<option value="2019">2019</option>
+		    	<option value="2020">2020</option>
+		    </select>
+		  </div>
+		  <button type="submit" ng-disabled="loading_rils" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Cerca</button>
+		</form>
+	</div>
+</div>
+<div class="row vertical-margin"></div>
+<div class="row" ng-show="loading_rils">
+	<div class="col-md-12">
+		<div class="alert alert-info"><span class="glyphicon glyphicon-hourglass"></span> Caricamento RIL di {{months[month - 1]}} {{year}}.</div>
+	</div>
+</div>
+<div class="row" ng-show="!loading_rils && !rils">
+	<div class="col-md-12">
+		<div class="alert alert-warning"><span class="glyphicon glyphicon-ban-circle"></span> Nessun RIL nel periodo selezionato.</div>
+	</div>
+</div>
+<div class="row" ng-show="rils">
+	<div class="col-md-12">
+		<form ng-submit="loadRil()" class="form-inline">
+			<p>{{employee_ids.length}} RIL trovati per {{months[month - 1]}} {{year}}.</p>
+		  <div class="form-group">
+		    <label>Dipendente</label>
+		    <select ng-model="employee_id" ng-disabled="loading_ril" class="form-control">
+		    	<option ng-repeat="e_id in employee_ids" value="{{e_id}}">{{employeeWithId(e_id).first_name}} {{employeeWithId(e_id).last_name}}</option>
+		    </select>
+		  </div>
+		  <button type="submit" ng-disabled="!employee_id" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Visualizza RIL</button>
+		</form>
+	</div>
+</div>
+<div class="row vertical-margin"></div>
+<div class="row" ng-show="loading_ril">
+	<div class="col-md-12">
+		<div class="alert alert-info"><span class="glyphicon glyphicon-hourglass"></span> Caricamento RIL di {{employeeWithId(employee_id).first_name}} {{employeeWithId(employee_id).last_name}} relativo a {{months[month - 1]}} {{year}}.</div>
+	</div>
+</div>
+<div class="row" ng-show="ril">
+	<div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading"><span class="glyphicon glyphicon-calendar"></span> RIL {{employeeWithId(employee_id).first_name}} {{employeeWithId(employee_id).last_name}} {{months[month - 1]}} {{year}}</div>
+		  <div class="table-responsive">
+			  <table class="table table-hover">
+			    <thead>
+			    	<tr>
+			    		<th>Giorno</th>
+			    		<th>Oario Ingresso</th>
+			    		<th>Orario Uscita</th>
+			    		<th>Codice Commessa</th>
+			    		<th>Assenza?</th>
+			    		<th>Trasferta?</th>
+			    		<th>Note Trasferta</th>
+			    	</tr>
+			    </thead>
+			    <tbody>
+			    	<tr ng-repeat="row in ril.rows" ng-controller="CompilaRigaRilController" ng-class="{ success: !row.status.incomplete && row.status.valid, warning: row.status.incomplete }">
+			    		<td>{{days_of_week[row.day.day_of_week - 1]}} {{row.day.day_of_month}}</td>
+			    		<td>{{row.data.entrance}}</td>
+			    		<td>{{row.data.exit}}</td>
+			    		<td>{{row.data.commission_code}}</td>
+			    		<td>{{printAbsence(row.data.absence)}}</td>
+			    		<td>{{printBusinessTrip(row.data.business_trip)}}</td>
+			    		<td>{{row.data.business_trip_notes}}</td>
+			    	</tr>
+			    </tbody>
+			  </table>
+			</div>
+		</div>
+	</div>
+</div>
