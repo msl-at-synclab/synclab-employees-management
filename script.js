@@ -14,6 +14,10 @@ app.config(['$routeProvider', function($routeProvider) {
 			templateUrl: 'compila_ril.html',
 			controller: 'CompilaRilController'
 		}).
+		when('/visualizza_ril', {
+			templateUrl: 'visualizza_ril.html',
+			controller: 'VisualizzaRilController'
+		}).
 		when('/logout', {
 			templateUrl: 'logout.html',
 			controller: 'LogoutController'
@@ -23,8 +27,8 @@ app.config(['$routeProvider', function($routeProvider) {
 
 app.factory('users', ['$q', '$timeout', function($q, $timeout) {
 	var users_list = [
-		{ id: 1, username: 'marcoliceti', password: 'marcoliceti123456', role: 'dipendente' },
-		{ id: 2, username: 'ddellatorre', password: 'ddellatorre123456', role: 'dipendente' },
+		{ id: 1, username: 'marcoliceti', password: 'marcoliceti123456', first_name: 'Marco', last_name: 'Liceti', role: 'dipendente' },
+		{ id: 2, username: 'ddellatorre', password: 'ddellatorre123456', first_name: 'Daniele', last_name: 'Della Torre', role: 'dipendente' },
 		{ id: 3, username: 'admin', password: 'admin', role: 'amministratore' }
 	];
 
@@ -35,6 +39,14 @@ app.factory('users', ['$q', '$timeout', function($q, $timeout) {
 		}
 	}
 
+	function usersWithRole(role) {
+		var result = [];
+		for (var i = 0; i < users_list.length; i++) {
+			if (users_list[i].role === role) result.push(users_list[i]);
+		}
+		return result;
+	}
+
 	return {
 		get: function (filters) {
 			var deferred = $q.defer();
@@ -43,6 +55,7 @@ app.factory('users', ['$q', '$timeout', function($q, $timeout) {
 				var result;
 				if (!filters) result = users_list;
 				else if (filters.username) result = userWithUsername(filters.username);
+				else if (filters.role) result = usersWithRole(filters.role);
 				deferred.resolve(result);
 			}, 1000);
 
@@ -298,6 +311,7 @@ app.controller('MenuController', ['$scope', '$location', 'session', function($sc
 		{ name: 'home', text: 'Home', path: '/home' },
 		{ name: 'login', text: 'Login', path: '/login', hide_after_login: true },
 		{ name: 'compila_ril', text: 'Compila RIL', path: '/compila_ril', requires_login: true, requires_role: 'dipendente' },
+		{ name: 'visualizza_ril', text: 'Visualizza RIL', path: '/visualizza_ril', requires_login: true, requires_role: 'amministratore' },
 		{ name: 'logout', text: 'Logout', path: '/logout', requires_login: true }
 	];
 
@@ -415,6 +429,92 @@ app.controller('CompilaRigaRilController', ['$scope', 'ril_checker', function($s
 		},
 		true
 	);
+}]);
+
+app.controller('VisualizzaRilController', ['$scope', 'ril_service', 'users', function($scope, ril_service, users) {
+	var today = new Date();
+	$scope.month = (today.getMonth() + 1).toString();
+	$scope.year = today.getFullYear().toString();
+
+	$scope.days_of_week = [ 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì' ];
+	$scope.months = [ 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre' ];
+
+	$scope.loadUsers = function () {
+		$scope.loading_eployees = true;
+		return users.get({ role: 'dipendente' }).then(function (employees) {
+			$scope.employees = employees;
+			$scope.loading_employees = false;
+		});
+	}
+
+	$scope.loadRils = function () {
+		$scope.loading_rils = true;
+		var search_params = { month: $scope.month, year: $scope.year };
+		ril_service.search(search_params).then(function (rils) {
+			$scope.rils = rils;
+			$scope.employee_ids = rils ? Object.keys(rils) : null;
+			$scope.loading_rils = false;
+		});
+	}
+
+	$scope.reloadRils = function () {
+		$scope.rils = null;
+		$scope.ril = null;
+		$scope.employee_ids = null;
+		$scope.employee_id = null;
+		$scope.loadRils();
+	}
+
+	$scope.loadRil = function () {
+		$scope.loading_ril = true;
+		var search_params = { month: $scope.month, year: $scope.year, user: $scope.employeeWithId($scope.employee_id) };
+		ril_service.search(search_params).then(function (ril) {
+			$scope.ril = ril;
+			$scope.loading_ril = false;
+		});
+	}
+
+	$scope.reloadRil = function () {
+		$scope.ril = null;
+		$scope.loadRil();
+	}
+
+	$scope.employeeWithId = function (id) {
+		if ($scope.employees) for (var i = 0; i < $scope.employees.length; i++) if ($scope.employees[i].id == id) return $scope.employees[i];
+	}
+
+	$scope.printAbsence = function (absence) {
+		var values = {
+			'no': 'No',
+			'festività': 'Festività',
+			'malattia': 'Malattia',
+			'permesso': 'Permesso',
+			'ferie': 'Ferie'
+		};
+		return values[absence];
+	}
+
+	$scope.printBusinessTrip = function (trip) {
+		var values = {
+			'no': 'No',
+			'trasferta': 'Trasferta',
+			'sede_disagiata': 'Sede Disagiata'
+		};
+		return values[trip];
+	}
+
+	$scope.$watch(function () { return $scope.month; }, function(new_value, old_value) {
+		if (new_value !== old_value) $scope.reloadRils();
+	});
+	$scope.$watch(function () { return $scope.year; }, function(new_value, old_value) {
+		if (new_value !== old_value) $scope.reloadRils();
+	});
+	$scope.$watch(function () { return $scope.employee_id; }, function(new_value, old_value) {
+		if (new_value !== old_value && new_value) $scope.reloadRil();
+	});
+
+	$scope.loading_rils = true;
+	$scope.loadUsers().then($scope.loadRils);
 }]);
 
 app.controller('LogoutController', ['$scope', 'session', function($scope, session) {
