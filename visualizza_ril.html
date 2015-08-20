@@ -60,7 +60,7 @@
 		    	<option ng-repeat="e_id in employee_ids" value="{{e_id}}">{{employeeWithId(e_id).first_name}} {{employeeWithId(e_id).last_name}}</option>
 		    </select>
 		  </div>
-		  <button type="submit" ng-disabled="!employee_id" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Visualizza RIL</button>
+		  <button type="submit" ng-disabled="!employee_id || loading_ril" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span> Visualizza RIL</button>
 		</form>
 	</div>
 </div>
