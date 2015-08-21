@@ -17,11 +17,15 @@
 		</div>
 	</div>
 </div>
-<div class="row">
+<div class="row" ng-hide="ril">
 	<div class="col-md-12">
-		<div class="alert alert-info" ng-hide="ril">
+		<div class="alert alert-info">
 			<span class="glyphicon glyphicon-hourglass"></span> Caricamento RIL in corso
 		</div>
+	</div>
+</div>
+<div class="row" ng-show="ril">
+	<div class="col-md-12">
 		<div class="panel panel-default" ng-show="ril">
 		  <div class="panel-heading"><span class="glyphicon glyphicon-calendar"></span> RIL {{months[month - 1]}} {{year}}</div>
 		  <div class="table-responsive">
@@ -60,6 +64,32 @@
 								</select>
 							</td>
 							<td><input ng-model="row.data.business_trip_notes" ng-disabled="saving" class="form-control" tooltip="Non compilare qualora non sia stata effettuata alcuna trasferta."></td>
+			    	</tr>
+			    </tbody>
+			  </table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row" ng-show="ril">
+	<div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading"><span class="glyphicon glyphicon-stats"></span> Statistiche Sumulative</div>
+		  <div class="table-responsive">
+			  <table class="table">
+			    <thead>
+			    	<tr>
+			    		<th>Ore Totali</th>
+			    		<th>Ore Totali (PICAP)</th>
+			    		<th>Ore Extra</th>
+			    		<th>Giornate Lavorative</th>
+			    	</tr>
+			    </thead>
+			    <tbody>
+			    		<td>{{ril_stats.tot_hours}}</td>
+			    		<td>{{ril_stats.tot_picap_hours}}</td>
+			    		<td>{{ril_stats.extra_hours}}</td>
+			    		<td>{{ril_stats.days_worked}}</td>
 			    	</tr>
 			    </tbody>
 			  </table>

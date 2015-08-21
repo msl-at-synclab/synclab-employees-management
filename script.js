@@ -306,6 +306,72 @@ app.factory('ril_checker', [function() {
 	};   
 }]);
 
+app.factory('ril_stats', [function() {
+	function timeAdd(t1, t2) {
+		var h1 = parseInt(t1.split(':')[0]);
+		var h2 = parseInt(t2.split(':')[0]);
+		var hr = h1 + h2;
+		var m1 = parseInt(t1.split(':')[1]);
+		var m2 = parseInt(t2.split(':')[1]);
+		var mr = m1 + m2;
+		if (mr > 60) {
+			hr++;
+			mr = mr - 60;
+		}
+		return hr + ':' + mr;
+	}
+
+	function timeDiff(t1, t2) {
+		var hr = 0;
+		var h1 = parseInt(t1.split(':')[0]);
+		var h2 = parseInt(t2.split(':')[0]);
+		var temp = h1;
+		while (temp < h2 - 1) { hr++; temp++; }
+		var m1 = parseInt(t1.split(':')[1]);
+		var m2 = parseInt(t2.split(':')[1]);
+		var mr;
+		if (h1 < h2) {
+			mr = (60 - m1) + m2;
+			if (mr >= 60) {
+				hr++;
+				mr = mr - 60;
+			}
+		} else mr = m2 - m1;
+		if (hr < 10) hr = '0' + hr;
+		if (mr < 10) mr = '0' + mr;
+		return hr + ':' + mr;
+	}
+
+	function picap(hours) {
+		var h = parseInt(hours.split(':')[0]);
+		var m = parseInt(hours.split(':')[1]);
+		return h + m / 60;
+	}
+
+	return {
+		calculateStats: function (ril) {
+			var tot_hours = '00:00';
+			var extra_hours = '00:00';
+			var days_worked = 0;
+			for (var i = 0; i < ril.rows.length; i++) {
+				var row = ril.rows[i];
+				if (!row.status.incomplete && row.status.valid && row.data.absence === 'no') {
+					var hours = timeDiff(row.data.entrance, row.data.exit);
+					tot_hours = timeAdd(tot_hours, timeDiff('01:00', hours));
+					extra_hours = timeAdd(extra_hours, timeDiff('09:00', hours));
+					days_worked += 1;
+				}
+			}
+			return {
+				tot_hours: tot_hours,
+				tot_picap_hours: picap(tot_hours),
+				extra_hours: extra_hours,
+				days_worked: days_worked
+			};
+		}
+	};   
+}]);
+
 app.controller('MenuController', ['$scope', '$location', 'session', function($scope, $location, session) {
 	$scope.items = [
 		{ name: 'home', text: 'Home', path: '/home' },
@@ -421,17 +487,19 @@ app.controller('CompilaRilController', ['$scope', 'ril_service', 'session', func
 	};
 }]);
 
-app.controller('CompilaRigaRilController', ['$scope', 'ril_checker', function($scope, ril_checker) {
+app.controller('CompilaRigaRilController', ['$scope', 'ril_checker', 'ril_stats', function($scope, ril_checker, ril_stats) {
 	$scope.$watch(
 		function () { return $scope.row; },
 		function (row) {
 			ril_checker.checkRow(row);
+			ril_scope = $scope.$parent.$parent;
+			ril_scope.ril_stats = ril_stats.calculateStats(ril_scope.ril);
 		},
 		true
 	);
 }]);
 
-app.controller('VisualizzaRilController', ['$scope', 'ril_service', 'users', function($scope, ril_service, users) {
+app.controller('VisualizzaRilController', ['$scope', 'ril_service', 'ril_stats', 'users', function($scope, ril_service, ril_stats, users) {
 	var today = new Date();
 	$scope.month = (today.getMonth() + 1).toString();
 	$scope.year = today.getFullYear().toString();
@@ -460,6 +528,7 @@ app.controller('VisualizzaRilController', ['$scope', 'ril_service', 'users', fun
 	$scope.reloadRils = function () {
 		$scope.rils = null;
 		$scope.ril = null;
+		$scope.ril_stats = null;
 		$scope.employee_ids = null;
 		$scope.employee_id = null;
 		$scope.loadRils();
@@ -470,12 +539,14 @@ app.controller('VisualizzaRilController', ['$scope', 'ril_service', 'users', fun
 		var search_params = { month: $scope.month, year: $scope.year, user: $scope.employeeWithId($scope.employee_id) };
 		ril_service.search(search_params).then(function (ril) {
 			$scope.ril = ril;
+			$scope.ril_stats = ril_stats.calculateStats(ril);
 			$scope.loading_ril = false;
 		});
 	}
 
 	$scope.reloadRil = function () {
 		$scope.ril = null;
+		$scope.ril_stats = null;
 		$scope.loadRil();
 	}
 
